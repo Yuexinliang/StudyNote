@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <!--配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--配置资源路径，直接在webapp下就不需要写路径-->
+        <property name="prefix" value="" />
+        <!--配置这个后在请求资源时忽略.jsp后缀-->
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!--配置映射器和适配器：选择默认-->
+    <!-- 设置注解扫描路径 -->
+    <context:component-scan base-package="com.jr"/>
+
+    <!-- 默认加载注解处理器映射器和处理器适配器及很多的参数绑定 ,可以配置自定义类型适配器-->
+    <mvc:annotation-driven conversion-service="formatc"/>
+
+    <!-- 配置类型适配器，这个匹配的是自定义的时间适配器 -->
+    <bean id="formatc" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.jr.util.MyDateConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>  <!-- /表示项目根目录；** 项目下任意路径以及任意子路径； 拦截所有请求路径 -->
+<!--            <mvc:exclude-mapping path="/emp/ts5"/>-->
+            <!--排除后就不会进入拦截器中了-->
+            <mvc:exclude-mapping path="/emp/mapshow"/>
+            <bean class="com.jr.handlers.MyHandler"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>
