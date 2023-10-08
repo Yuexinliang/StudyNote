@@ -72,7 +72,7 @@ public class EmpController {
     @RequestMapping("/ts2")
     public void test02(HttpServletResponse response,HttpSession session) throws IOException {
         session.setAttribute("info","String返回值形式");
-        /*会从服务器根目录查找，所以要拼接tomcat上配置的项目名，也就是应用程序上下文*/
+        /*会从服务器根目录查找，所以要拼接tomcat上配置的项目名，也就是应用程序上下文，但这里我的应用程序上下文只有/，所以就不用拼接了*/
         response.sendRedirect("/ok.jsp");
     }
     /*接受entity实体类*/
@@ -143,7 +143,7 @@ public class EmpController {
         return "redirect:/ok.jsp";
     }
 
-    /*批量修改*/
+    /*批量修改,将修改后的list集合或map集合存储进Emp对象内进行展示*/
     @RequestMapping("/update")
     public ModelAndView update(Emp emp){
         ModelAndView mv = new ModelAndView();
