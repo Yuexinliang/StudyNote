@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jr.mapper.EmpMapper">
+
+  <insert id="insertEmp" parameterType="Emp">
+    insert into emp(empno,ename,job,mgr,hiredate,sal,comm,deptno) values (#{empno},#{ename},#{job},#{mgr},#{hiredate},#{sal},#{comm},#{deptno})
+  </insert>
+  <select id="selectByEmpno" parameterType="int" resultType="empDept">
+    select e.*,d.dname,d.loc from emp e
+    inner join dept d
+    on d.deptno = e.deptno
+    where empno = #{empno}
+  </select>
+</mapper>

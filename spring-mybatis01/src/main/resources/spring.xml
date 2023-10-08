@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+	   http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-4.3.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <!--加载外部属性文件，获得连接数据库四要素-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driverClass}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${user}"/>
+        <property name="password" value="${password}"/>
+
+    </bean>
+    <!-- 管理sqlsessionFactory对象,
+    SqlSessionFactoryBean中默认配置了xml文件的位置，大概是与mapper的目录一致，不一致会找不到方法。 -->
+    <bean id="factory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+    <!--配置mapper映射文件扫描器，扫描的是接口并配置代理对象 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.jr.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="factory"/>
+    </bean>
+    <!--配置注解扫描路径 -->
+    <context:component-scan base-package="com.jr"/>
+    <!--配置aop自动创建代理类-->
+    <aop:aspectj-autoproxy/>
+    <!--配置事务管理对象-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+<!--    &lt;!&ndash;配置事务传播策略-->
+<!--    规范：传播策略都是配置在service层-->
+<!--    name属性值是 service实现类中的方法前缀；-->
+<!--    propagation 属性值 设置事务的传播策略；REQUIRED 有事务就加入；没有就创建（增，删，改）-->
+<!--                                      SUPPORTS 有事务就加入，没有也不创建（查询）-->
+<!--    事务的隔离级别，Spring框架采用默认方式，自动识别&ndash;&gt;-->
+<!--    <tx:advice id="txAdvice" transaction-manager="txManager">-->
+<!--        <tx:attributes>-->
+<!--            <tx:method name="add*" propagation="REQUIRED" />-->
+<!--            <tx:method name="remove*" propagation="REQUIRED"/>-->
+<!--            <tx:method name="up*" propagation="REQUIRED"/>-->
+<!--            <tx:method name="get*" propagation="SUPPORTS"/>-->
+<!--        </tx:attributes>-->
+<!--    </tx:advice>-->
+<!--    &lt;!&ndash;配置声明式事务的xml方式： &ndash;&gt;-->
+<!--    <aop:config>-->
+<!--        <aop:pointcut id="servicePointcut" expression="execution(* com.jr.service.impl.DeptServiceImpl.*(..))"/>-->
+<!--        <aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointcut"/>-->
+<!--    </aop:config>-->
+
+    <!--配置事务的注解驱动-->
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+</beans>
